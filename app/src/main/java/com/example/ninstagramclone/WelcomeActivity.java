@@ -34,7 +34,7 @@ public class WelcomeActivity extends AppCompatActivity {
                         if(e==null){
                             FancyToast.makeText(WelcomeActivity.this,"Log Out Success",
                                     FancyToast.LENGTH_SHORT,FancyToast.SUCCESS,true).show();
-                            Intent intent=new Intent(WelcomeActivity.this,SignUpLoginActivity.class);
+                            Intent intent=new Intent(WelcomeActivity.this, LogInActivity.class);
                             startActivity(intent);
                             finish();
                         } else{
