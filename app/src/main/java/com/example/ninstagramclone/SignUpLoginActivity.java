@@ -2,6 +2,7 @@ package com.example.ninstagramclone;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -40,6 +41,9 @@ public class SignUpLoginActivity extends AppCompatActivity {
                         if(e==null){
                             FancyToast.makeText(SignUpLoginActivity.this,"Sign Up Success",
                                     FancyToast.LENGTH_SHORT,FancyToast.SUCCESS,true).show();
+                            Intent intent=new Intent(SignUpLoginActivity.this,WelcomeActivity.class);
+                            startActivity(intent);
+                            finish();
                         } else{
                             FancyToast.makeText(SignUpLoginActivity.this,e.getMessage(),
                                     FancyToast.LENGTH_SHORT,FancyToast.ERROR,true).show();
@@ -56,8 +60,11 @@ public class SignUpLoginActivity extends AppCompatActivity {
                     @Override
                     public void done(ParseUser user, ParseException e) {
                         if(user!=null && e==null){
+                            Intent intent=new Intent(SignUpLoginActivity.this,WelcomeActivity.class);
+                            startActivity(intent);
                             FancyToast.makeText(SignUpLoginActivity.this,"Log In Success",
                                     FancyToast.LENGTH_SHORT,FancyToast.SUCCESS,true).show();
+                            finish();
                         } else{
                             FancyToast.makeText(SignUpLoginActivity.this,e.getMessage(),
                                     FancyToast.LENGTH_SHORT,FancyToast.ERROR,true).show();
