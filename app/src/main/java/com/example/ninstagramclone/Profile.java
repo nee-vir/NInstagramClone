@@ -43,6 +43,37 @@ public class Profile extends Fragment implements View.OnClickListener{
         textFavSport=view.findViewById(R.id.fav_sport_et);
         updateButton=view.findViewById(R.id.updateInfoBtn);
         parseUser=ParseUser.getCurrentUser();
+        if(parseUser.get("profileName")==null){
+            textName.setText("");
+        }
+        else{
+            textName.setText(parseUser.get("profileName").toString());
+        }
+        if(parseUser.get("bio")==null){
+            textBio.setText("");
+        }
+        else{
+            textBio.setText(parseUser.get("bio").toString());
+        }
+        if(parseUser.get("profession")==null){
+            textProfession.setText("");
+        }
+        else{
+            textProfession.setText(parseUser.get("profession").toString());
+        }
+        if(parseUser.get("hobbies")==null){
+            textHobbies.setText("");
+        }
+        else{
+            textHobbies.setText(parseUser.get("hobbies").toString());
+        }
+        if(parseUser.get("favouriteSport")==null){
+            textFavSport.setText("");
+        }
+        else{
+            textFavSport.setText(parseUser.get("favouriteSport").toString());
+        }
+
         updateButton.setOnClickListener(this);
         return view;
     }
