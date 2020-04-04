@@ -33,7 +33,8 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         loginButton.setOnClickListener(this);
         toSignUpButton.setOnClickListener(this);
         if(ParseUser.getCurrentUser()!=null){
-            ParseUser.logOut();
+            Intent intent=new Intent(LogInActivity.this,WelcomeActivity.class);
+            startActivity(intent);
         }
     }
 
