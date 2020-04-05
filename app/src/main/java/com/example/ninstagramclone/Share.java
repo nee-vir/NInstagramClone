@@ -91,9 +91,9 @@ public class Share extends Fragment implements View.OnClickListener{
                         dialog.setMessage("Loading...");
                         dialog.show();
                         ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
-                        receivedImageBitmap.compress(Bitmap.CompressFormat.PNG,100,byteArrayOutputStream);
+                        receivedImageBitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
                         byte [] bytes=byteArrayOutputStream.toByteArray();
-                        ParseFile parseFile=new ParseFile("pic.png",bytes);
+                        ParseFile parseFile=new ParseFile("pic.jpg",bytes);
                         ParseObject parseObject=new ParseObject("Photo");
                         parseObject.put("picture",parseFile);
                         parseObject.put("images_des",description.getText().toString());
