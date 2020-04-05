@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -32,18 +33,25 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class Share extends Fragment implements View.OnClickListener{
+    private static final int PICK_IMAGE = 2000;
     private ImageView imageView;
     private EditText description;
     private Button shareButton;
     Bitmap receivedImageBitmap;
+    private Uri selectedImage;
 
     public Share() {
         // Required empty public constructor
@@ -79,6 +87,9 @@ public class Share extends Fragment implements View.OnClickListener{
                     if(description.getText().toString().equals("")){
                         FancyToast.makeText(getContext(),"Description cannot be left empty",FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show();
                     } else{
+                        final ProgressDialog dialog=new ProgressDialog(getContext());
+                        dialog.setMessage("Loading...");
+                        dialog.show();
                         ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
                         receivedImageBitmap.compress(Bitmap.CompressFormat.PNG,100,byteArrayOutputStream);
                         byte [] bytes=byteArrayOutputStream.toByteArray();
@@ -87,9 +98,7 @@ public class Share extends Fragment implements View.OnClickListener{
                         parseObject.put("picture",parseFile);
                         parseObject.put("images_des",description.getText().toString());
                         parseObject.put("username", ParseUser.getCurrentUser().getUsername());
-                        final ProgressDialog dialog=new ProgressDialog(getContext());
-                        dialog.setMessage("Loading...");
-                        dialog.show();
+
                         parseObject.saveInBackground(new SaveCallback() {
                             @Override
                             public void done(ParseException e) {
@@ -112,8 +121,16 @@ public class Share extends Fragment implements View.OnClickListener{
     private void getChosenImage() {
 
 //        FancyToast.makeText(getContext(),"Now we can access the images",FancyToast.LENGTH_SHORT,FancyToast.INFO,false).show();
-        Intent intent=new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent,2000);
+        Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        getIntent.setType("image/*");
+
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickIntent.setType("image/*");
+
+        Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
+
+        startActivityForResult(chooserIntent, PICK_IMAGE);
 
 
     }
@@ -132,23 +149,65 @@ public class Share extends Fragment implements View.OnClickListener{
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) { //This part is not working
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==2000){
-            if(resultCode== Activity.RESULT_OK){
+        if(requestCode==PICK_IMAGE){
+            if(resultCode==Activity.RESULT_OK&&data!=null){
                 try{
-                    Uri selectedImage=data.getData();
-                    String[] filePathColumn={ MediaStore.Images.Media.DATA};
-                    Cursor cursor=getActivity().getContentResolver().query(selectedImage,filePathColumn,null,null,null);
-                    cursor.moveToFirst();
-                    int columnIndex= cursor.getColumnIndex(filePathColumn[0]);
-                    String picturePath=cursor.getString(columnIndex);
-                    cursor.close();
-                    receivedImageBitmap= BitmapFactory.decodeFile(picturePath);
+                    selectedImage=data.getData();
+                    receivedImageBitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), selectedImage);
+//                    Glide.with(this)
+//                            .load(selectedImage)
+//                            .centerCrop()
+//                            .into(imageView);
                     imageView.setImageBitmap(receivedImageBitmap);
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
 
-                }catch (Exception e){
+
+            }
+        }
+    }
+    public Bitmap loadBitmap(String url)
+    {
+        Bitmap bm = null;
+        InputStream is = null;
+        BufferedInputStream bis = null;
+        try
+        {
+            URLConnection conn = new URL(url).openConnection();
+            conn.connect();
+            is = conn.getInputStream();
+            bis = new BufferedInputStream(is, 8192);
+            bm = BitmapFactory.decodeStream(bis);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally {
+            if (bis != null)
+            {
+                try
+                {
+                    bis.close();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            if (is != null)
+            {
+                try
+                {
+                    is.close();
+                }
+                catch (IOException e)
+                {
                     e.printStackTrace();
                 }
             }
         }
+        return bm;
     }
 }
